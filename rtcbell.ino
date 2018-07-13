@@ -22,7 +22,7 @@ void loop() {
   
   lcd.clear();
   lcd.print("welcome");
-  
+  delay(1000);
   int mode=EEPROM.read(0);
   if(mode==0&&day!=6)
   {
@@ -53,8 +53,11 @@ void loop() {
     while(digitalRead(6))
     {
       i=i+1000;
-      delay(1000);
-       
+      lcd.clear();
+      
+      if(i>5000)
+      lcd.print("Edit mode");
+       delay(1000);
     }
 
 
@@ -87,14 +90,21 @@ void loop() {
       t:
       delay(60);
       lcd.clear();
+      if(rmode==5)
+      {lcd.print("Edit time");goto r;
+      }
       lcd.print("Rmode: ");
-      lcd.print(rmode);
+      lcd.print(rmode);r:
       if(digitalRead(7))
       {
         while(digitalRead(7));
         rmode++;
-        if(rmode>4)
+        if(rmode>5)
         rmode=1;
+          
+          
+          
+        
       }
 
       if(digitalRead(6))
@@ -111,7 +121,7 @@ void loop() {
             lcd.print(EEPROM.read(x));
             lcd.print(":");
             lcd.print(EEPROM.read(y));
-            lcd.setCursor(0, 1);
+            //lcd.setCursor(0, 1);
             lcd.print(":");
             lcd.print(EEPROM.read(z));
             delay(30);
@@ -236,6 +246,23 @@ case 3:
               
               
               }
+
+ case 5:
+ while(1){lcd.clear();
+          lcd.print(RTC.getHours());
+          lcd.print(":");
+          lcd.print(RTC.getMinutes());
+          lcd.print(" D");
+          lcd.print(RTC.getDayOfWeek());
+          int p1=map(analogRead(A0),0,1023,0,24);
+              RTC.setHours(p1);RTC.setClock();
+              int p2=map(analogRead(A1),0,1023,0,59);
+              RTC.setMinutes(p2);RTC.setClock();
+              int p3=map(analogRead(A2),0,1023,1,7);
+              RTC.setDayOfWeek(p3);
+              RTC.setClock();
+          }
+        
             }
             }
             }
@@ -262,14 +289,14 @@ case 3:
         break;
       }
       for(int i=x;i<=y;)
-        {delay(500);
+        {
           
           if(i>y){
           goto top;
         }
         RTC.readClock();
           int h=RTC.getHours();
-           
+           lcd.clear();
         lcd.print(h);
         lcd.print(":");
         lcd.print(RTC.getMinutes());
@@ -277,18 +304,21 @@ case 3:
           goto x;
         }
        delay(50);
-       lcd.clear();
+       
           if(EEPROM.read(i)==h)
           { 
             for(int i=xm;i<=ym;){
-                lcd.clear();
+               // lcd.clear();
               //lcd.print(i);
            
             int m=RTC.getMinutes();
             if(EEPROM.read(i)==m)
-            {
+            {i++;
+              int dl=EEPROM.read(i);
+              i--;
             digitalWrite(13,1);
-            delay(2000);
+            dl=dl*1000;
+            delay(dl);
             digitalWrite(13,0);
             for(long s=65000;s>=0;){
               lcd.clear();
@@ -299,7 +329,7 @@ case 3:
             if(digitalRead(8))
             {lcd.clear();
               while(digitalRead(8));
-              lcd.print("stopped");
+              lcd.print("stoped");
               
               delay(60000);
               goto next;
@@ -309,8 +339,9 @@ case 3:
             }
             
             digitalWrite(10,1);
-            delay(EEPROM.read(i++)*125);
-            digitalWrite(10,0);i--;
+            //dl=dl*1000;
+            delay(dl);
+            digitalWrite(10,0);
             next:
             delay(1000);
             }
@@ -329,5 +360,4 @@ case 3:
     
   
   
-
 
